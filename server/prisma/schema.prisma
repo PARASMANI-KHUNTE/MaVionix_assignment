@@ -1,0 +1,116 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  NEGOTIATION
+  CONVERTED
+  LOST
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ActivityType {
+  CALL
+  EMAIL
+  MEETING
+  NOTE
+  FOLLOW_UP
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+}
+
+model Lead {
+  id             String         @id @default(uuid())
+  fullName       String
+  email          String
+  phone          String?
+  companyName    String?
+  jobTitle       String?
+  source         String?
+  status         LeadStatus     @default(NEW)
+  priority       LeadPriority   @default(MEDIUM)
+  estimatedValue Float?         @default(0)
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  activities     Activity[]
+  followUps      FollowUp[]
+  analyses       LeadAnalysis[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([email])
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  leadId      String
+  type        ActivityType
+  subject     String
+  description String?
+  occurredAt  DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  lead        Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([occurredAt])
+  @@index([type])
+}
+
+model FollowUp {
+  id          String         @id @default(uuid())
+  leadId      String
+  title       String
+  description String?
+  dueAt       DateTime
+  status      FollowUpStatus @default(PENDING)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  lead        Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([dueAt])
+  @@index([status])
+}
+
+model LeadAnalysis {
+  id                    String   @id @default(uuid())
+  leadId                String
+  summary               String
+  score                 Int      // 1 - 100
+  conversionProbability Float    // 0 - 100 percentage estimate
+  keySignals            String[]
+  nextBestAction        String
+  followUpSubject       String
+  followUpBody          String
+  limitations           String[]
+  provider              String   // e.g. "gemini" or "mock"
+  model                 String   // e.g. "gemini-1.5-flash" or "mock-deterministic"
+  createdAt             DateTime @default(now())
+
+  lead                  Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([createdAt])
+}
