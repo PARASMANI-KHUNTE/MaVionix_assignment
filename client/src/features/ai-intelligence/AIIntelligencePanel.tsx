@@ -79,7 +79,7 @@ export const AIIntelligencePanel: React.FC<AIIntelligencePanelProps> = ({
                   variant={analysis.provider === 'gemini' ? 'info' : 'warning'}
                   className="text-[10px] uppercase font-semibold"
                 >
-                  {analysis.provider === 'gemini' ? 'Gemini 1.5 Flash' : 'Demo / Mock AI'}
+                  {analysis.provider === 'gemini' ? (analysis.model || 'Gemini') : 'Demo / Mock AI'}
                 </Badge>
               )}
             </div>
