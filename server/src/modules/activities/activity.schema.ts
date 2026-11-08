@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ActivityTypeEnum = z.enum(['CALL', 'EMAIL', 'MEETING', 'NOTE', 'FOLLOW_UP', 'STATUS_CHANGE']);
+export const ActivityTypeEnum = z.enum(['CALL', 'EMAIL', 'MEETING', 'NOTE', 'FOLLOW_UP']);
 
 export const createActivitySchema = z.object({
   type: ActivityTypeEnum,

@@ -18,7 +18,7 @@ describe('AI CRM Backend API Test Suite', () => {
   });
 
   // Helper to add API key to requests
-  const auth = (req: request.SuperTest<request.Test>) => req.set('x-api-key', TEST_API_KEY);
+  const auth = (req: request.Test) => req.set('x-api-key', TEST_API_KEY);
 
   describe('1. Health Check', () => {
     it('GET /api/health should return status healthy and DB connected', async () => {
@@ -101,9 +101,9 @@ describe('AI CRM Backend API Test Suite', () => {
     });
 
     it('PATCH /api/v1/leads/:id/status should update stage to INTERESTED and record activity', async () => {
-      const res = await auth(request(app))
-        .patch(`/api/v1/leads/${createdLeadId}/status`)
-        .send({ status: 'INTERESTED' });
+      const res = await auth(
+        request(app).patch(`/api/v1/leads/${createdLeadId}/status`)
+      ).send({ status: 'INTERESTED' });
       expect(res.status).toBe(200);
       expect(res.body.data.status).toBe('INTERESTED');
 

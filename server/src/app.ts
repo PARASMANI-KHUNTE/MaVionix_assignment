@@ -102,6 +102,7 @@ app.get('/api/health', async (_req, res) => {
 
 // Register feature modules
 app.use('/api/v1/leads', leadRoutes);
+app.use('/api/v1/leads', pipelineRoutes); // Supports PATCH /api/v1/leads/:id/status
 app.use('/api/v1/pipeline', pipelineRoutes);
 app.use('/api/v1/activities', activityRoutes);
 app.use('/api/v1/follow-ups', followUpRoutes);

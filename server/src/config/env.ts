@@ -11,7 +11,7 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
   AI_PROVIDER: z.enum(['gemini', 'mock']).default('mock'),
   GEMINI_API_KEY: z.string().optional().default(''),
-  GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
+  GEMINI_MODEL: z.string().default('gemini-3.5-flash'),
   // Authentication
   API_KEYS: z.string().optional().default(''), // Comma-separated list of valid API keys
   ALLOW_NO_AUTH: z.enum(['true', 'false']).default('false'), // Allow requests without API key in development

@@ -28,7 +28,6 @@ enum ActivityType {
   MEETING
   NOTE
   FOLLOW_UP
-  STATUS_CHANGE
 }
 
 enum FollowUpStatus {

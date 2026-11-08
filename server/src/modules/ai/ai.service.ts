@@ -1,7 +1,7 @@
 import { prisma } from '../../config/db.js';
 import { env } from '../../config/env.js';
 import { NotFoundError } from '../../utils/errors.js';
-import { AIProvider, LeadContextData } from './ai.interface.js';
+import { AIProvider, LeadContextData, LeadAnalysisOutput } from './ai.interface.js';
 import { MockAIProvider } from './mock.provider.js';
 import { GeminiAIProvider } from './gemini.provider.js';
 
@@ -66,7 +66,21 @@ export class AIService {
     };
 
     const provider = this.getProvider();
-    const result = await provider.analyzeLead(context);
+    let result: LeadAnalysisOutput;
+    try {
+      result = await provider.analyzeLead(context);
+    } catch (providerError: any) {
+      if (provider instanceof GeminiAIProvider) {
+        console.warn(
+          '⚠️ Gemini provider failed, falling back gracefully to deterministic Mock provider:',
+          providerError?.message || providerError
+        );
+        const fallbackProvider = new MockAIProvider();
+        result = await fallbackProvider.analyzeLead(context);
+      } else {
+        throw providerError;
+      }
+    }
 
     // Persist analysis record
     const savedAnalysis = await prisma.leadAnalysis.create({

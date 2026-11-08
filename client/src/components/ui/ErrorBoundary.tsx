@@ -49,7 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <Button onClick={this.handleRetry} icon={<RefreshCw className="h-4 w-4 mr-2" />}>
             Try Again
           </Button>
-          {process.env.NODE_ENV === 'development' && this.state.error && (
+          {import.meta.env.DEV && this.state.error && (
             <details className="mt-6 text-left w-full max-w-md">
               <summary className="text-xs text-slate-500 cursor-pointer mb-2">Error Details</summary>
               <pre className="text-[10px] bg-slate-100 p-3 rounded overflow-auto text-slate-700">
