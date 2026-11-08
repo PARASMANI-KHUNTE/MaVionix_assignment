@@ -15,7 +15,9 @@
     "test": "npm --prefix server run test",
     "seed": "npm --prefix server run prisma:seed",
     "prisma:generate": "npm --prefix server run prisma:generate",
-    "prisma:push": "npm --prefix server run prisma:push"
+    "prisma:push": "npm --prefix server run prisma:push",
+    "start": "node server/dist/server.js",
+    "build:render": "npm install && npm --prefix server install && npm --prefix client install && npm run prisma:generate && npm run build"
   },
   "dependencies": {
     "@neon/config": "^1.13.0",

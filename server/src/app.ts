@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import fs from 'fs';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { prisma } from './config/db.js';
@@ -22,7 +24,12 @@ import neonRoutes from './modules/neon/neon.routes.js';
 export const app = express();
 
 // Security and utility middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // CORS - strict origin checking
 const allowedOrigins = [
@@ -114,6 +121,26 @@ app.use('/api/v1/ai', aiLimiter, aiRoutes); // Apply AI-specific rate limiting
 app.use('/api/v1/storage', storageRoutes); // Neon Object Storage
 app.use('/api/v1/realtime', realtimeRoutes); // Neon Realtime Live Queries
 app.use('/api/v1/neon', neonRoutes); // Neon Diagnostics and Serverless Functions
+
+// Serve built frontend assets in production if available
+const clientDist = path.resolve(__dirname, '../../../client/dist');
+const altClientDist = path.resolve(__dirname, '../../client/dist');
+const staticPath = fs.existsSync(clientDist)
+  ? clientDist
+  : fs.existsSync(altClientDist)
+  ? altClientDist
+  : null;
+
+if (staticPath) {
+  app.use(express.static(staticPath));
+  app.get('*', (req, res, next) => {
+    // Only intercept non-API GET requests
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(staticPath, 'index.html'));
+  });
+}
 
 // 404 handler for unknown routes
 app.use('*', (req, res) => {
