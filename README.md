@@ -1,13 +1,17 @@
 # NexusCRM — AI-Powered Sales Intelligence CRM
 
+[![Live Production](https://img.shields.io/badge/Render-Live_Production-brightgreen.svg?logo=render)](https://ai-powered-crm-ftzx.onrender.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.1-646cff.svg)](https://vitejs.dev/)
 [![Express](https://img.shields.io/badge/Express-4.21-green.svg)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.22-2d3748.svg)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791.svg)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/Neon_Postgres-Cloud-blue.svg)](https://neon.tech/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38b2ac.svg)](https://tailwindcss.com/)
-[![Gemini](https://img.shields.io/badge/Gemini_API-1.5_Flash-orange.svg)](https://ai.google.dev/)
+[![Gemini](https://img.shields.io/badge/Gemini_API-3.5_Flash-orange.svg)](https://ai.google.dev/)
+
+> 🚀 **Live Production URL**: [https://ai-powered-crm-ftzx.onrender.com](https://ai-powered-crm-ftzx.onrender.com)  
+> 🏥 **Health Check API**: [https://ai-powered-crm-ftzx.onrender.com/api/health](https://ai-powered-crm-ftzx.onrender.com/api/health)
 
 NexusCRM is a full-stack, responsive, and robust Customer Relationship Management system built for modern sales teams. It empowers sales representatives to track prospective leads across a 6-stage Kanban pipeline, log multi-channel customer interactions, schedule follow-ups with derived overdue tracking, and leverage grounded AI lead intelligence for automated deal scoring, conversion probability estimates, and contextual follow-up email drafts.
 
