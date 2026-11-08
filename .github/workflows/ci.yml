@@ -1,0 +1,130 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck-and-security:
+    name: Typecheck & Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci || npm install
+
+      - name: Install server dependencies
+        run: npm --prefix server ci || npm --prefix server install
+
+      - name: Install client dependencies
+        run: npm --prefix client ci || npm --prefix client install
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Run TypeScript typecheck (Server & Client)
+        run: npm run typecheck
+
+      - name: Security Audit (Root & Client)
+        run: |
+          npm audit --audit-level=high || true
+          npm --prefix client audit --audit-level=high || true
+
+  test:
+    name: Backend & Neon Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: crm_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/crm_test?schema=public
+      DATABASE_URL_UNPOOLED: postgresql://postgres:postgrespassword@localhost:5432/crm_test?schema=public
+      NODE_ENV: test
+      AI_PROVIDER: mock
+      ALLOW_NO_AUTH: 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm --prefix server install
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Push Database Schema
+        run: npm run prisma:push
+
+      - name: Seed Database
+        run: npm run seed
+
+      - name: Run Test Suite (Vitest)
+        run: npm run test
+
+  build:
+    name: Production Build Verification
+    needs: [typecheck-and-security, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install all dependencies
+        run: |
+          npm install
+          npm --prefix server install
+          npm --prefix client install
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Run Production Build (Server & Client)
+        run: npm run build
+
+      - name: Verify Build Artifacts
+        run: |
+          test -f server/dist/server.js || { echo "Missing server/dist/server.js"; exit 1; }
+          test -f client/dist/index.html || { echo "Missing client/dist/index.html"; exit 1; }
+          echo "Production artifacts verified successfully!"

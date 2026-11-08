@@ -3,22 +3,25 @@ node_modules/
 .pnp
 .pnp.js
 
-# Production builds
+# Production builds & artifacts
 dist/
 build/
 out/
 .next/
+*.tsbuildinfo
 
-# Environment files
+# Environment files & secrets
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 *.env
+server/.env
+client/.env
 
 # Exceptions
 !.env.example
+!server/.env.example
+!client/.env.example
 
 # Logs
 logs/
@@ -40,11 +43,16 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 
-# Test coverage
+# Test coverage & caches
 coverage/
 *.lcov
+.vitest/
 
-# Prisma generated artifacts
+# Neon CLI Local State
+.neon/
+.neon
+
+# Prisma temporary files
 prisma/*.db
 prisma/*.db-journal
-.neon
+*.tmp*
