@@ -5,8 +5,8 @@ import { CreateActivityInput } from './activity.schema.js';
 export class ActivityController {
   static async getActivities(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const activities = await ActivityService.getActivitiesByLeadId(id);
+      const { leadId } = req.query;
+      const activities = await ActivityService.getActivitiesByLeadId(leadId as string);
       res.json({
         success: true,
         data: activities,
@@ -18,8 +18,8 @@ export class ActivityController {
 
   static async createActivity(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const activity = await ActivityService.createActivity(id, req.body as CreateActivityInput);
+      const { leadId, ...data } = req.body as CreateActivityInput & { leadId: string };
+      const activity = await ActivityService.createActivity(leadId, data);
       res.status(201).json({
         success: true,
         message: 'Activity recorded successfully',

@@ -1,20 +1,26 @@
 import { Router } from 'express';
 import { ActivityController } from './activity.controller.js';
 import { validateRequest } from '../../middleware/validate.js';
-import { leadIdParamSchema } from '../leads/lead.schema.js';
 import { createActivitySchema } from './activity.schema.js';
+import { z } from 'zod';
 
-const router = Router({ mergeParams: true });
+const leadIdParamSchema = z.object({
+  id: z.string().uuid('Invalid lead ID format'),
+});
 
+const router = Router();
+
+// GET /api/v1/activities?leadId=xxx
 router.get(
-  '/:id/activities',
-  validateRequest({ params: leadIdParamSchema }),
+  '/',
+  validateRequest({ query: z.object({ leadId: z.string().uuid() }) }),
   ActivityController.getActivities
 );
 
+// POST /api/v1/activities
 router.post(
-  '/:id/activities',
-  validateRequest({ params: leadIdParamSchema, body: createActivitySchema }),
+  '/',
+  validateRequest({ body: createActivitySchema.extend({ leadId: z.string().uuid() }) }),
   ActivityController.createActivity
 );
 

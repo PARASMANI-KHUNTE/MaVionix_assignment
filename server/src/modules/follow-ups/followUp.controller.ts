@@ -23,8 +23,8 @@ export class FollowUpController {
 
   static async createFollowUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const followUp = await FollowUpService.createFollowUp(id, req.body as CreateFollowUpInput);
+      const { leadId, ...data } = req.body as CreateFollowUpInput & { leadId: string };
+      const followUp = await FollowUpService.createFollowUp(leadId, data);
       res.status(201).json({
         success: true,
         message: 'Follow-up created successfully',

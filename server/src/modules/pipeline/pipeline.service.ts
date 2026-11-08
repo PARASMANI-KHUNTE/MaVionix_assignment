@@ -89,7 +89,7 @@ export class PipelineService {
       prisma.activity.create({
         data: {
           leadId,
-          type: ActivityType.FOLLOW_UP,
+          type: ActivityType.STATUS_CHANGE,
           subject: `Stage updated from ${previousStatus} to ${newStatus}`,
           description: `Lead moved along the sales pipeline from ${previousStatus} to ${newStatus}.`,
           occurredAt: new Date(),

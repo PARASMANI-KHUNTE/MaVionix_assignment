@@ -12,6 +12,9 @@ const envSchema = z.object({
   AI_PROVIDER: z.enum(['gemini', 'mock']).default('mock'),
   GEMINI_API_KEY: z.string().optional().default(''),
   GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
+  // Authentication
+  API_KEYS: z.string().optional().default(''), // Comma-separated list of valid API keys
+  ALLOW_NO_AUTH: z.enum(['true', 'false']).default('false'), // Allow requests without API key in development
 });
 
 const parsed = envSchema.safeParse(process.env);

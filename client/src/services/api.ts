@@ -12,7 +12,18 @@ import {
   PaginatedResponse,
 } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
+const API_KEY = import.meta.env.VITE_API_KEY || '';
+
+function getHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  if (API_KEY) {
+    headers['x-api-key'] = API_KEY;
+  }
+  return headers;
+}
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -36,31 +47,31 @@ async function handleResponse<T>(res: Response): Promise<T> {
 export const api = {
   // Health
   async getHealth(): Promise<any> {
-    const res = await fetch(`${API_BASE}/health`);
+    const res = await fetch(`${API_BASE.replace('/v1', '')}/health`);
     return handleResponse(res);
   },
 
   // Dashboard
   async getDashboardSummary(): Promise<DashboardSummary> {
-    const res = await fetch(`${API_BASE}/dashboard/summary`);
+    const res = await fetch(`${API_BASE}/dashboard/summary`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: DashboardSummary }>(res);
     return json.data;
   },
 
   async getDashboardDistribution(): Promise<DashboardDistribution[]> {
-    const res = await fetch(`${API_BASE}/dashboard/lead-distribution`);
+    const res = await fetch(`${API_BASE}/dashboard/lead-distribution`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: DashboardDistribution[] }>(res);
     return json.data;
   },
 
   async getDashboardPerformance(): Promise<DashboardPerformance[]> {
-    const res = await fetch(`${API_BASE}/dashboard/sales-performance`);
+    const res = await fetch(`${API_BASE}/dashboard/sales-performance`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: DashboardPerformance[] }>(res);
     return json.data;
   },
 
   async getRecentActivities(limit = 8): Promise<Activity[]> {
-    const res = await fetch(`${API_BASE}/dashboard/recent-activities?limit=${limit}`);
+    const res = await fetch(`${API_BASE}/dashboard/recent-activities?limit=${limit}`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: Activity[] }>(res);
     return json.data;
   },
@@ -84,12 +95,12 @@ export const api = {
     if (params?.sortBy) query.append('sortBy', params.sortBy);
     if (params?.sortOrder) query.append('sortOrder', params.sortOrder);
 
-    const res = await fetch(`${API_BASE}/leads?${query.toString()}`);
+    const res = await fetch(`${API_BASE}/leads?${query.toString()}`, { headers: getHeaders() });
     return handleResponse<PaginatedResponse<Lead>>(res);
   },
 
   async getLeadById(id: string): Promise<Lead & { activities: Activity[]; followUps: FollowUp[]; analyses: LeadAnalysis[] }> {
-    const res = await fetch(`${API_BASE}/leads/${id}`);
+    const res = await fetch(`${API_BASE}/leads/${id}`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: any }>(res);
     return json.data;
   },
@@ -108,7 +119,7 @@ export const api = {
   }): Promise<Lead> {
     const res = await fetch(`${API_BASE}/leads`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     const json = await handleResponse<{ success: boolean; data: Lead }>(res);
@@ -132,7 +143,7 @@ export const api = {
   ): Promise<Lead> {
     const res = await fetch(`${API_BASE}/leads/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     const json = await handleResponse<{ success: boolean; data: Lead }>(res);
@@ -142,13 +153,14 @@ export const api = {
   async deleteLead(id: string): Promise<{ success: boolean; message: string }> {
     const res = await fetch(`${API_BASE}/leads/${id}`, {
       method: 'DELETE',
+      headers: getHeaders(),
     });
     return handleResponse(res);
   },
 
   // Pipeline
   async getPipeline(): Promise<PipelineResponse> {
-    const res = await fetch(`${API_BASE}/pipeline`);
+    const res = await fetch(`${API_BASE}/pipeline`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: PipelineResponse }>(res);
     return json.data;
   },
@@ -156,7 +168,7 @@ export const api = {
   async updateLeadStatus(id: string, status: LeadStatus): Promise<Lead> {
     const res = await fetch(`${API_BASE}/leads/${id}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ status }),
     });
     const json = await handleResponse<{ success: boolean; data: Lead }>(res);
@@ -165,7 +177,7 @@ export const api = {
 
   // Activities
   async getActivities(leadId: string): Promise<Activity[]> {
-    const res = await fetch(`${API_BASE}/leads/${leadId}/activities`);
+    const res = await fetch(`${API_BASE}/activities?leadId=${leadId}`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: Activity[] }>(res);
     return json.data;
   },
@@ -179,10 +191,10 @@ export const api = {
       occurredAt?: string;
     }
   ): Promise<Activity> {
-    const res = await fetch(`${API_BASE}/leads/${leadId}/activities`, {
+    const res = await fetch(`${API_BASE}/activities`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      headers: getHeaders(),
+      body: JSON.stringify({ ...data, leadId }),
     });
     const json = await handleResponse<{ success: boolean; data: Activity }>(res);
     return json.data;
@@ -205,7 +217,7 @@ export const api = {
     if (params?.page) query.append('page', params.page.toString());
     if (params?.limit) query.append('limit', params.limit.toString());
 
-    const res = await fetch(`${API_BASE}/follow-ups?${query.toString()}`);
+    const res = await fetch(`${API_BASE}/follow-ups?${query.toString()}`, { headers: getHeaders() });
     return handleResponse(res);
   },
 
@@ -217,10 +229,10 @@ export const api = {
       dueAt: string;
     }
   ): Promise<FollowUp> {
-    const res = await fetch(`${API_BASE}/leads/${leadId}/follow-ups`, {
+    const res = await fetch(`${API_BASE}/follow-ups`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      headers: getHeaders(),
+      body: JSON.stringify({ ...data, leadId }),
     });
     const json = await handleResponse<{ success: boolean; data: FollowUp }>(res);
     return json.data;
@@ -237,7 +249,7 @@ export const api = {
   ): Promise<FollowUp> {
     const res = await fetch(`${API_BASE}/follow-ups/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     const json = await handleResponse<{ success: boolean; data: FollowUp }>(res);
@@ -247,6 +259,7 @@ export const api = {
   async deleteFollowUp(id: string): Promise<{ success: boolean; message: string }> {
     const res = await fetch(`${API_BASE}/follow-ups/${id}`, {
       method: 'DELETE',
+      headers: getHeaders(),
     });
     return handleResponse(res);
   },
@@ -255,14 +268,14 @@ export const api = {
   async analyzeLead(id: string): Promise<LeadAnalysis> {
     const res = await fetch(`${API_BASE}/ai/leads/${id}/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
     });
     const json = await handleResponse<{ success: boolean; data: LeadAnalysis }>(res);
     return json.data;
   },
 
   async getLatestAnalysis(id: string): Promise<LeadAnalysis | null> {
-    const res = await fetch(`${API_BASE}/ai/leads/${id}/latest`);
+    const res = await fetch(`${API_BASE}/ai/leads/${id}/latest`, { headers: getHeaders() });
     const json = await handleResponse<{ success: boolean; data: LeadAnalysis | null }>(res);
     return json.data;
   },

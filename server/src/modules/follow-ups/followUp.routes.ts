@@ -1,27 +1,27 @@
 import { Router } from 'express';
 import { FollowUpController } from './followUp.controller.js';
 import { validateRequest } from '../../middleware/validate.js';
-import { leadIdParamSchema } from '../leads/lead.schema.js';
 import {
   createFollowUpSchema,
   updateFollowUpSchema,
   queryFollowUpsSchema,
   followUpIdParamSchema,
 } from './followUp.schema.js';
+import { z } from 'zod';
 
 const router = Router();
 
-// /api/follow-ups
+// GET /api/v1/follow-ups
 router.get('/', validateRequest({ query: queryFollowUpsSchema }), FollowUpController.getFollowUps);
 
-// /api/leads/:id/follow-ups
+// POST /api/v1/follow-ups
 router.post(
-  '/leads/:id/follow-ups',
-  validateRequest({ params: leadIdParamSchema, body: createFollowUpSchema }),
+  '/',
+  validateRequest({ body: createFollowUpSchema.extend({ leadId: z.string().uuid() }) }),
   FollowUpController.createFollowUp
 );
 
-// /api/follow-ups/:id
+// PATCH /api/v1/follow-ups/:id
 router.patch(
   '/:id',
   validateRequest({ params: followUpIdParamSchema, body: updateFollowUpSchema }),

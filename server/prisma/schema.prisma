@@ -28,6 +28,7 @@ enum ActivityType {
   MEETING
   NOTE
   FOLLOW_UP
+  STATUS_CHANGE
 }
 
 enum FollowUpStatus {
@@ -113,4 +114,5 @@ model LeadAnalysis {
 
   @@index([leadId])
   @@index([createdAt])
+  @@index([leadId, createdAt])
 }

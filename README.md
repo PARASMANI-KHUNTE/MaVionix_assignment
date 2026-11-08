@@ -122,11 +122,15 @@ CLIENT_URL="http://localhost:5173"
 AI_PROVIDER="mock"
 GEMINI_API_KEY=""
 GEMINI_MODEL="gemini-1.5-flash"
+# Authentication (comma-separated API keys)
+API_KEYS="your-api-key-1,your-api-key-2"
+ALLOW_NO_AUTH="true"
 ```
 
 Configure frontend environment variables in `client/.env`:
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api/v1
+VITE_API_KEY=your-api-key-here
 ```
 
 ### 2. Install Dependencies
@@ -185,7 +189,10 @@ Visit `http://localhost:5173` to explore the CRM.
 | `AI_PROVIDER` | AI backend engine (`gemini` or `mock`) | `mock` |
 | `GEMINI_API_KEY` | Google Gemini API key from Google AI Studio | `""` |
 | `GEMINI_MODEL` | Gemini model name | `gemini-1.5-flash` |
-| `VITE_API_URL` | API base URL consumed by the Vite client | `http://localhost:5000/api` |
+| `API_KEYS` | Comma-separated valid API keys for authentication | `""` |
+| `ALLOW_NO_AUTH` | Allow requests without API key in development (`true`/`false`) | `false` |
+| `VITE_API_URL` | API base URL consumed by the Vite client | `http://localhost:5000/api/v1` |
+| `VITE_API_KEY` | API key sent by client for authentication | `""` |
 
 ---
 

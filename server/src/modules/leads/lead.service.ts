@@ -2,6 +2,7 @@ import { prisma } from '../../config/db.js';
 import { CreateLeadInput, UpdateLeadInput, QueryLeadsInput } from './lead.schema.js';
 import { NotFoundError } from '../../utils/errors.js';
 import { Prisma } from '@prisma/client';
+import { ActivityType } from '@prisma/client';
 
 export class LeadService {
   static async getLeads(query: QueryLeadsInput) {
@@ -89,20 +90,37 @@ export class LeadService {
   }
 
   static async createLead(data: CreateLeadInput) {
-    return prisma.lead.create({
-      data: {
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone || null,
-        companyName: data.companyName || null,
-        jobTitle: data.jobTitle || null,
-        source: data.source || null,
-        status: data.status,
-        priority: data.priority,
-        estimatedValue: data.estimatedValue,
-        notes: data.notes || null,
-      },
+    // Create lead and initial activity in a transaction
+    const lead = await prisma.$transaction(async (tx) => {
+      const newLead = await tx.lead.create({
+        data: {
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone || null,
+          companyName: data.companyName || null,
+          jobTitle: data.jobTitle || null,
+          source: data.source || null,
+          status: data.status,
+          priority: data.priority,
+          estimatedValue: data.estimatedValue,
+          notes: data.notes || null,
+        },
+      });
+
+      await tx.activity.create({
+        data: {
+          leadId: newLead.id,
+          type: ActivityType.NOTE,
+          subject: 'Lead created',
+          description: `New lead "${data.fullName}" added to CRM${data.companyName ? ` at ${data.companyName}` : ''}.`,
+          occurredAt: new Date(),
+        },
+      });
+
+      return newLead;
     });
+
+    return lead;
   }
 
   static async updateLead(id: string, data: UpdateLeadInput) {
