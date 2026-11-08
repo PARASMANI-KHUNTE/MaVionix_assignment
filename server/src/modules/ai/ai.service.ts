@@ -4,9 +4,13 @@ import { NotFoundError } from '../../utils/errors.js';
 import { AIProvider, LeadContextData, LeadAnalysisOutput } from './ai.interface.js';
 import { MockAIProvider } from './mock.provider.js';
 import { GeminiAIProvider } from './gemini.provider.js';
+import { NeonAIGatewayProvider } from './neon-gateway.provider.js';
 
 export class AIService {
   private static getProvider(): AIProvider {
+    if (env.AI_PROVIDER === 'neon' && env.NEON_AI_GATEWAY_TOKEN && env.NEON_AI_GATEWAY_TOKEN.trim() !== '') {
+      return new NeonAIGatewayProvider();
+    }
     if (env.AI_PROVIDER === 'gemini' && env.GEMINI_API_KEY && env.GEMINI_API_KEY.trim() !== '') {
       return new GeminiAIProvider();
     }
@@ -70,15 +74,20 @@ export class AIService {
     try {
       result = await provider.analyzeLead(context);
     } catch (providerError: any) {
-      if (provider instanceof GeminiAIProvider) {
-        console.warn(
-          '⚠️ Gemini provider failed, falling back gracefully to deterministic Mock provider:',
-          providerError?.message || providerError
-        );
+      console.warn(
+        `⚠️ ${provider.name} failed (${providerError?.message || providerError}), attempting fallback...`
+      );
+      if (provider instanceof NeonAIGatewayProvider && env.GEMINI_API_KEY) {
+        try {
+          const gemini = new GeminiAIProvider();
+          result = await gemini.analyzeLead(context);
+        } catch {
+          const fallbackProvider = new MockAIProvider();
+          result = await fallbackProvider.analyzeLead(context);
+        }
+      } else {
         const fallbackProvider = new MockAIProvider();
         result = await fallbackProvider.analyzeLead(context);
-      } else {
-        throw providerError;
       }
     }
 

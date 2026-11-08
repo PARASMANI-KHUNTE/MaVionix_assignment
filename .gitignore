@@ -47,3 +47,4 @@ coverage/
 # Prisma generated artifacts
 prisma/*.db
 prisma/*.db-journal
+.neon

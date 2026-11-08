@@ -255,9 +255,9 @@ describe('AI CRM Backend API Test Suite', () => {
       expect(typeof ai.followUpMessage.subject).toBe('string');
       expect(typeof ai.followUpMessage.body).toBe('string');
 
-      // Check labeling (provider is either gemini or mock)
-      expect(['gemini', 'mock']).toContain(ai.provider);
+      // Check labeling (provider is either gemini, mock, or neon-ai-gateway)
+      expect(['gemini', 'mock', 'neon-ai-gateway']).toContain(ai.provider);
       expect(typeof ai.model).toBe('string');
-    });
+    }, 30000);
   });
 });

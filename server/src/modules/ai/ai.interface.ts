@@ -51,14 +51,14 @@ export const LeadAnalysisOutputSchema = z.object({
   nextBestAction: z.string().min(1, 'Next best action is required'),
   followUpMessage: FollowUpMessageSchema,
   limitations: z.array(z.string()).default([]),
-  provider: z.enum(['gemini', 'mock']),
+  provider: z.enum(['gemini', 'mock', 'neon-ai-gateway']),
   model: z.string(),
 });
 
 export type LeadAnalysisOutput = z.infer<typeof LeadAnalysisOutputSchema>;
 
 export interface AIProvider {
-  readonly name: 'gemini' | 'mock';
+  readonly name: 'gemini' | 'mock' | 'neon-ai-gateway';
   readonly modelName: string;
   analyzeLead(context: LeadContextData): Promise<LeadAnalysisOutput>;
 }

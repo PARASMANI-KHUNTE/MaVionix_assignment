@@ -279,4 +279,51 @@ export const api = {
     const json = await handleResponse<{ success: boolean; data: LeadAnalysis | null }>(res);
     return json.data;
   },
+
+  // Neon Cloud Services Integration
+  async getNeonStatus(): Promise<any> {
+    const res = await fetch(`${API_BASE}/neon/status`, { headers: getHeaders() });
+    return handleResponse(res);
+  },
+
+  async invokeNeonFunction(): Promise<any> {
+    const res = await fetch(`${API_BASE}/neon/function/hello`, { headers: getHeaders() });
+    return handleResponse(res);
+  },
+
+  async getStorageFiles(prefix?: string): Promise<{ success: boolean; count: number; data: any[] }> {
+    const query = prefix ? `?prefix=${encodeURIComponent(prefix)}` : '';
+    const res = await fetch(`${API_BASE}/storage/files${query}`, { headers: getHeaders() });
+    return handleResponse(res);
+  },
+
+  async uploadStorageFile(key: string, content: string, contentType = 'text/plain'): Promise<any> {
+    const res = await fetch(`${API_BASE}/storage/upload`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ key, content, contentType }),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteStorageFile(key: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/storage/files/${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async getRealtimeConfig(): Promise<any> {
+    const res = await fetch(`${API_BASE}/realtime/config`, { headers: getHeaders() });
+    return handleResponse(res);
+  },
+
+  async sealLeadsQuery(): Promise<any> {
+    const res = await fetch(`${API_BASE}/realtime/seal-leads`, {
+      method: 'POST',
+      headers: getHeaders(),
+    });
+    return handleResponse(res);
+  },
 };

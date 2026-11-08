@@ -15,6 +15,9 @@ import activityRoutes from './modules/activities/activity.routes.js';
 import followUpRoutes from './modules/follow-ups/followUp.routes.js';
 import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
+import storageRoutes from './modules/storage/storage.routes.js';
+import realtimeRoutes from './modules/realtime/realtime.routes.js';
+import neonRoutes from './modules/neon/neon.routes.js';
 
 export const app = express();
 
@@ -108,6 +111,9 @@ app.use('/api/v1/activities', activityRoutes);
 app.use('/api/v1/follow-ups', followUpRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/ai', aiLimiter, aiRoutes); // Apply AI-specific rate limiting
+app.use('/api/v1/storage', storageRoutes); // Neon Object Storage
+app.use('/api/v1/realtime', realtimeRoutes); // Neon Realtime Live Queries
+app.use('/api/v1/neon', neonRoutes); // Neon Diagnostics and Serverless Functions
 
 // 404 handler for unknown routes
 app.use('*', (req, res) => {
