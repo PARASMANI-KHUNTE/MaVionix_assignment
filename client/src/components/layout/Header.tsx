@@ -1,6 +1,7 @@
 import React from 'react';
-import { Menu, Plus, Sparkles } from 'lucide-react';
+import { Menu, Plus, Sparkles, Compass } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useTutorial } from '../../features/tutorial/TutorialContext';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -8,6 +9,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, onOpenCreateLead }) => {
+  const { startTutorial, isOpen } = useTutorial();
+
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 sm:px-6 backdrop-blur">
       <div className="flex items-center gap-3">
@@ -27,7 +30,17 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, onOpenCreateLead })
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={startTutorial}
+          className="border-indigo-200 text-indigo-700 hover:bg-indigo-50/80 shadow-xs"
+          icon={<Compass className="h-4 w-4 text-indigo-600" />}
+        >
+          {isOpen ? 'Tour Active' : 'Tutorial Mode'}
+        </Button>
+
         <Button
           size="sm"
           icon={<Plus className="h-4 w-4" />}

@@ -52,6 +52,11 @@ NexusCRM is a full-stack, responsive, and robust Customer Relationship Managemen
   5. *Personalized Follow-up Draft*: Ready-to-send email copy with 1-click clipboard copy.
 - **Transparent Mode Labeling**: Displays whether analysis is produced by Google Gemini or the deterministic Mock AI engine.
 
+### 7. Interactive Tutorial Mode (Onboarding Tour)
+- 6-step guided product walkthrough accessible via the top navigation bar with auto-route navigation.
+- Guides users through Dashboard KPIs, Leads multi-field search, Kanban pipeline drag & drop, Customer Profiles, Activity Timelines, Overdue Reminders, and AI Lead Intelligence.
+- Features minimization, progress dots, keyboard shortcuts (`Escape`, Arrow keys), and contextual pro tips.
+
 ---
 
 ## Technology Stack
